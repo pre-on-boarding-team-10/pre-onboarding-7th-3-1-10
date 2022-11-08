@@ -1,5 +1,6 @@
 module.exports = {
   env: {
+    node: true,
     browser: true,
     es2021: true,
   },
@@ -22,6 +23,9 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {},
+    },
+    react: {
+      version: 'detect',
     },
   },
 };
