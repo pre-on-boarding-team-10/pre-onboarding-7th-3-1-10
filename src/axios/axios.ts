@@ -17,14 +17,15 @@ export const axiosApi = async (keyword: string) => {
   return axiosData;
 };
 
-// axiosInstance.interceptors.request.use(
-//   config => {
-//     return config
-//     },
-//   error => {
-//     return Promise.reject(error);
-//   }
-// );
+axiosInstance.interceptors.request.use(
+  config => {
+    console.info("calling api")
+    return config
+    },
+  error => {
+    return Promise.reject(error);
+  }
+);
 
 // axiosInstance.interceptors.response.use(
 //   response => {

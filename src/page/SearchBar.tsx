@@ -5,28 +5,26 @@ import styled from 'styled-components';
 const SearchBar = () => {
   const [stateSearchWord, setSearchWord] = useState<string>();
   const [stateSearchList, setSearchList] = useState<any[]>();
-  const regex = /[^ㄱ-ㅎ]/g;
+  const regex1 = /[^ㄱ-ㅎ]/g;
+  const regex2 = /[^ㄱ-ㅎ]/g;
 
   const getSearchList = async (word: string) => {
     if (
-      regex.test(word.split('')[0]) &&
-      regex.test(word.split('')[word.length - 1]) &&
+      regex1.test(word.split('')[0]) &&
+      regex2.test(word.split('')[word.length - 1]) &&
       word.length > 0
     ) {
       const searchList = await axiosApi(word);
-      console.log(searchList.data);
-      setSearchList(searchList.data);
-      return searchList.data;
+      if (searchList.data.length == 0) {
+        setSearchList([{ sickCd: 1, sickNm: '검색어없음' }]);
+      } else {
+        setSearchList(searchList.data);
+      }
+      // return searchList.data;
+    } else {
+      setSearchList([{ sickCd: 1, sickNm: '검색어없음' }]);
     }
-    console.log(
-      regex.test(word.split('')[0]),
-      regex.test(word.split('')[word.length - 1])
-    );
-    console.log(word.split('')[0], word.split('')[word.length - 1]);
   };
-  useEffect(() => {
-    console.log(stateSearchWord);
-  }, [stateSearchWord]);
   return (
     <React.Fragment>
       <h1>국내 모든 임상시험 검색하고 온라인으로 참여하기</h1>
@@ -47,7 +45,6 @@ const SearchBar = () => {
                   {el.sickNm.split('').map((word: string) => {
                     for (let i = 0; i < stateSearchWord.length; i++) {
                       if (stateSearchWord.includes(word)) {
-                        console.log(stateSearchWord.split('')[i]);
                         return <BoldWord>{word}</BoldWord>;
                       } else {
                         return word;
