@@ -5,18 +5,30 @@ import { MininFlexStyle } from '../styles/common';
 import { SearchService } from '../service/SearchService';
 import { useState } from 'react';
 import { ISearchResultListState } from '../types/pages';
+import DOMPurify from 'dompurify';
 
 const Search = (): React.ReactElement => {
+  const [typedSearchWord, setTypedSearchWord] = useState<string>('');
   const [searchResultList, setSearchResultList] = useState<
     ISearchResultListState[]
   >([]);
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchService = new SearchService();
+    setTypedSearchWord(e.target.value);
     const searchResultResponse = await searchService.getSearchResult({
       q: e.target.value,
     });
     setSearchResultList(searchResultResponse.data);
+  };
+
+  const replaceMatchedTextToBold = (searchSentence: string) => {
+    const isMatchedTextRegExp = new RegExp(typedSearchWord, 'g');
+
+    return searchSentence.replace(
+      isMatchedTextRegExp,
+      `<strong>${typedSearchWord}</strong>`
+    );
   };
 
   return (
@@ -46,9 +58,13 @@ const Search = (): React.ReactElement => {
                 className="width_height-18"
                 icon={faMagnifyingGlass}
               />
-              <SearchResultParagraph>
-                {searchResultItem.sickNm}
-              </SearchResultParagraph>
+              <SearchResultParagraph
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(
+                    replaceMatchedTextToBold(searchResultItem.sickNm)
+                  ),
+                }}
+              />
             </SearchResultItem>
           ))}
         </SearchResultList>
@@ -159,6 +175,10 @@ const SearchResultItem = styled.li`
   })}
   padding: 1rem 2rem;
   cursor: pointer;
+
+  > p > strong {
+    font-weight: 700;
+  }
 
   &:hover {
     background-color: #f5f6fa;
