@@ -2,8 +2,23 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { MininFlexStyle } from '../styles/common';
+import { SearchService } from '../service/SearchService';
+import { useState } from 'react';
+import { ISearchResultListState } from '../types/pages';
 
 const Search = (): React.ReactElement => {
+  const [searchResultList, setSearchResultList] = useState<
+    ISearchResultListState[]
+  >([]);
+
+  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchService = new SearchService();
+    const searchResultResponse = await searchService.getSearchResult({
+      q: e.target.value,
+    });
+    setSearchResultList(searchResultResponse.data);
+  };
+
   return (
     <SearchLayout>
       <SearchHeader>
@@ -16,18 +31,26 @@ const Search = (): React.ReactElement => {
             className="search-icon width_height-18"
             icon={faMagnifyingGlass}
           />
-          <SearchInput type="text" placeholder="질환명을 입력해주세요." />
+          <SearchInput
+            type="text"
+            placeholder="질환명을 입력해주세요."
+            onChange={onChange}
+          />
           <SearchButton>검색</SearchButton>
         </SearchInputBox>
         <SearchResultList>
           <SearchResultH3>추천 검색어</SearchResultH3>
-          <SearchResultItem>
-            <FontAwesomeIcon
-              className="width_height-18"
-              icon={faMagnifyingGlass}
-            />
-            <SearchResultParagraph>검색 결과 1</SearchResultParagraph>
-          </SearchResultItem>
+          {searchResultList.map(searchResultItem => (
+            <SearchResultItem key={searchResultItem.sickCd}>
+              <FontAwesomeIcon
+                className="width_height-18"
+                icon={faMagnifyingGlass}
+              />
+              <SearchResultParagraph>
+                {searchResultItem.sickNm}
+              </SearchResultParagraph>
+            </SearchResultItem>
+          ))}
         </SearchResultList>
       </SearchSection>
     </SearchLayout>
@@ -119,7 +142,7 @@ const SearchButton = styled.button`
 const SearchResultList = styled.ul`
   ${MininFlexStyle({
     flexDirection: 'column',
-    gap: '2rem',
+    gap: '1rem',
     margin: '1rem 0 0 0',
   })}
   position: absolute;
@@ -134,7 +157,7 @@ const SearchResultItem = styled.li`
   ${MininFlexStyle({
     gap: '1rem',
   })}
-  padding: 2rem;
+  padding: 1rem 2rem;
   cursor: pointer;
 
   &:hover {
