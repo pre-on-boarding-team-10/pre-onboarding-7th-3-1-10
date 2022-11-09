@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { RecoilRoot } from 'recoil';
 import Router from './router';
 import GlobalStyle from './styles/GlobalStyle';
 
@@ -9,7 +10,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.Fragment>
-    <GlobalStyle />
-    <Router />
+    <RecoilRoot>
+      <GlobalStyle />
+      <Router />
+    </RecoilRoot>
   </React.Fragment>
 );

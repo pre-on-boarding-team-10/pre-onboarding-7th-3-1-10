@@ -1,19 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { IoIosSearch } from 'react-icons/io';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
+import { IoIosSearch } from 'react-icons/io';
+import SearchModal from '../components/SearchModal';
+import { useRecoilState } from 'recoil';
+import { recentSearchList } from '../recoil/SearchWord';
 
-function MainPage() {
-  const [inputs, setInputs] = useState('');
+function MainPage(): React.ReactElement {
+  const [input, setInput] = useState('');
   const [focused, setFocused] = useState(false);
+  const [recentSearch, setRecentSearch] =
+    useRecoilState<string[]>(recentSearchList);
   const onFocus = () => setFocused(true);
   const onBlur = () => setFocused(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(inputRef);
-    setInputs(e.target.value);
+    setInput(e.target.value);
   };
 
+  const handleSearch: React.FormEventHandler<HTMLFormElement> = e => {
+    e.preventDefault();
+    if (input.length > 0) {
+      setRecentSearch([...recentSearch, input]);
+      setInput('');
+    }
+  };
   return (
     <Section>
       <Container>
@@ -22,30 +33,33 @@ function MainPage() {
           온라인으로 참여하기
         </Title>
         <SearchBarContainer className={focused ? 'focus' : 'blur'}>
-          <InputContainer>
-            <SearchBarLabel
-              htmlFor="searchBar"
-              className={focused ? 'focus' : ''}
-            >
+          <SearchBarForm onSubmit={handleSearch}>
+            <InputContainer>
+              <SearchBarLabel
+                htmlFor="searchBar"
+                className={input || focused ? 'focus' : ''}
+              >
+                <IoIosSearch className="icon" />
+                질환명을 입력해 주세요.
+              </SearchBarLabel>
+              <SearchBarInput
+                id="searchBar"
+                name="searchBar"
+                type="search"
+                spellCheck="false"
+                ref={inputRef}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                onChange={onChange}
+                value={input}
+              />
+            </InputContainer>
+            <SearchBtn>
               <IoIosSearch className="icon" />
-              질환명을 입력해 주세요.
-            </SearchBarLabel>
-            <SearchBarInput
-              id="searchBar"
-              name="searchBar"
-              type="search"
-              spellCheck="false"
-              ref={inputRef}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              onChange={onChange}
-              value={inputs}
-            />
-          </InputContainer>
-          <SearchBtn>
-            <IoIosSearch className="icon" />
-          </SearchBtn>
+            </SearchBtn>
+          </SearchBarForm>
         </SearchBarContainer>
+        {focused ? <SearchModal input={input} /> : ''}
       </Container>
     </Section>
   );
@@ -61,7 +75,7 @@ const Container = styled.article`
   align-items: center;
   flex-direction: column;
   background-color: #cae9ff;
-  padding: 7.5rem 0 18.125rem 0;
+  padding: 7.5rem 0 11rem 0;
 `;
 
 const Title = styled.h2`
@@ -75,7 +89,7 @@ const Title = styled.h2`
 
 const SearchBarContainer = styled.div`
   display: flex;
-  max-width: 490px;
+  max-width: 35rem;
   width: 100%;
   margin: 0 auto;
   border-radius: 42px;
@@ -89,11 +103,19 @@ const SearchBarContainer = styled.div`
   }
 `;
 
+const SearchBarForm = styled.form`
+  display: flex;
+  width: 100%;
+  align-items: center;
+`;
+
 const SearchBtn = styled.button`
   color: #fff;
   background-color: #007be9;
   padding: 0.5rem;
   border-radius: 50%;
+  width: 3.3rem;
+  height: 3.3rem;
   .icon {
     width: 2rem;
     height: 2rem;
@@ -102,7 +124,7 @@ const SearchBtn = styled.button`
 
 const InputContainer = styled.div`
   position: relative;
-  width: 26.875rem;
+  width: 100%;
   padding: 20px 10px 20px 24px;
 `;
 
@@ -124,8 +146,8 @@ const SearchBarLabel = styled.label`
 
 const SearchBarInput = styled.input`
   width: 100%;
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: 1.2rem;
+  font-weight: 500;
   letter-spacing: -0.018em;
   line-height: 1.6;
   border: #fff;

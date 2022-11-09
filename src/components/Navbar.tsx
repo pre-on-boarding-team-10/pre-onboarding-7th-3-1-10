@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function Navbar() {
+function Navbar(): React.ReactElement {
   return (
     <Section>
       <Container>
@@ -25,7 +25,7 @@ function Navbar() {
 
 const Section = styled.section`
   width: 100vw;
-  height: 3.5rem;
+  height: 4rem;
 `;
 
 const Container = styled.article`
