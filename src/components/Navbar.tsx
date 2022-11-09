@@ -30,6 +30,7 @@ const Section = styled.section`
 
 const Container = styled.article`
   width: 62.5rem;
+  height: 100%;
   margin: 0 auto;
   position: static;
   display: flex;
@@ -43,13 +44,13 @@ const Logocontainer = styled.div`
 `;
 
 const LogoImg = styled.img`
-  height: 2.2rem;
+  height: 2rem;
 `;
 
-const LogoTitle = styled.button`
-  font-size: 1.5rem;
+const LogoTitle = styled.h1`
+  font-size: 1.2rem;
   line-height: 1.6;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.1em;
   padding: 0.5rem;
   background-color: transparent;
