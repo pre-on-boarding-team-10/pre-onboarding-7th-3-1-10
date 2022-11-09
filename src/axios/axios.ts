@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:4000',
@@ -6,25 +6,21 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-})
+});
 
-export const axiosApi = async(keyword:string) =>{
-  const axiosData = await axiosInstance.get(
-    'sick',{
-      params :{
-        q : keyword,
-      }
-    }
-   )
-   return axiosData;
-}
+export const axiosApi = async (keyword: string) => {
+  const axiosData = await axiosInstance.get('sick', {
+    params: {
+      q: keyword,
+    },
+  });
+  return axiosData;
+};
 
 // axiosInstance.interceptors.request.use(
 //   config => {
-    
-//     }`;
-//     return config;
-//   },
+//     return config
+//     },
 //   error => {
 //     return Promise.reject(error);
 //   }
