@@ -14,10 +14,6 @@ function MainPage() {
     setInputs(e.target.value);
   };
 
-  useEffect(() => {
-    console.log('qq');
-  }, [focused]);
-
   return (
     <Section>
       <Container>
@@ -27,7 +23,16 @@ function MainPage() {
         </Title>
         <SearchBarContainer className={focused ? 'focus' : 'blur'}>
           <InputContainer>
+            <SearchBarLabel
+              htmlFor="searchBar"
+              className={focused ? 'focus' : ''}
+            >
+              <IoIosSearch className="icon" />
+              질환명을 입력해 주세요.
+            </SearchBarLabel>
             <SearchBarInput
+              id="searchBar"
+              name="searchBar"
               type="search"
               spellCheck="false"
               ref={inputRef}
@@ -83,6 +88,7 @@ const SearchBarContainer = styled.div`
     border-color: #007be9;
   }
 `;
+
 const SearchBtn = styled.button`
   color: #fff;
   background-color: #007be9;
@@ -93,10 +99,27 @@ const SearchBtn = styled.button`
     height: 2rem;
   }
 `;
+
 const InputContainer = styled.div`
-  display: flex;
+  position: relative;
   width: 26.875rem;
   padding: 20px 10px 20px 24px;
+`;
+
+const SearchBarLabel = styled.label`
+  position: absolute;
+  color: #999999;
+  font-weight: 500;
+  font-size: 1.2rem;
+  .icon {
+    position: relative;
+    top: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  &.focus {
+    display: none;
+  }
 `;
 
 const SearchBarInput = styled.input`
