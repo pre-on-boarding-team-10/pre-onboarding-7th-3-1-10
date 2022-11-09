@@ -17,6 +17,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
 	  line-height: 1;
+    background-color: #d0e8fd;
   }
 
   ol, ul {
