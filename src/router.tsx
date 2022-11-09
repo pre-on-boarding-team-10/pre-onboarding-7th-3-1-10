@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Test from './Test';
+import SearchBar from './page/SearchBar';
 
 const router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Test />} />
+        <Route path="/" element={<SearchBar />} />
       </Routes>
     </BrowserRouter>
   );
