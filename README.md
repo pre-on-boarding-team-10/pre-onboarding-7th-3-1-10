@@ -3,13 +3,8 @@
 ## 10팀 맴버 구성
 
 <br/>
-확장
-message.txt
-7KB
-﻿
-# 원티드 프리온보딩 프론트엔드 - Week 3-1
 
-## 10팀 맴버 구성
+## 10팀 멤버 구성
 
 <br/>
 
@@ -139,11 +134,17 @@ npm install
 
    XSS공격 방지를 위해 DOMPurify 사용
 
+<br/>
+
 2. API 호출별로 로컬 캐싱 구현
+
+<br/>
 
 3. 디바운싱
 
    https://github.com/pre-on-boarding-team-10/pre-onboarding-7th-3-1-10/blob/551c97106cd3cb5dcaa9a3c01a414978b715ec5d/src/hooks/useTextDebounce.ts#L1-L15
+
+<br/>
 
 4. 키보드 방향키 이동하여 리스트 이동 효과
 
