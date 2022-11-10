@@ -1,7 +1,7 @@
-import axios, { AxiosAdapter } from 'axios';
+import axios from 'axios';
 
 const interceptor = axios.create({
-  baseURL: 'http://localhost:4000',
+  baseURL: 'https://front-server-7th-3-1-10.herokuapp.com',
 });
 
 interceptor.interceptors.request.use(
