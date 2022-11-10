@@ -7,7 +7,7 @@ import { ChangeEvent, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { replaceMatchedTextToBold } from '../utils/pages';
 import useMoveUpAndDown from '../hooks/useMoveUpAndDown';
-import useAPIDebounce from '../hooks/useAPIDebounce';
+import useAPIDebounce from '../hooks/useCache';
 import useTextDebounce from '../hooks/useTextDebounce';
 
 const Search = (): React.ReactElement => {
@@ -23,12 +23,9 @@ const Search = (): React.ReactElement => {
     });
   };
 
-  const isBlankTypedSearchWord = typedSearchWord === '';
-
   const searchResultList = useAPIDebounce(
     debouncedTypeSearchWord,
-    getSearchResultAPI,
-    !isInputFocus || isBlankTypedSearchWord
+    getSearchResultAPI
   );
 
   const {

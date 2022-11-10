@@ -22,13 +22,12 @@ const useMoveUpAndDown = () => {
     searchResultList: IAPIDebounceResState[]
   ) => {
     const isArrowDownActive = currLocatedIdx < searchResultList.length - 1;
+    const isArrowUpActive = currLocatedIdx !== 0;
 
     if (e.key === 'ArrowDown' && isArrowDownActive) {
       setCurrLocatedIdx(prev => prev + 1);
       return;
     }
-
-    const isArrowUpActive = currLocatedIdx !== 0;
 
     if (e.key === 'ArrowUp' && isArrowUpActive) {
       setCurrLocatedIdx(prev => prev - 1);
@@ -43,7 +42,6 @@ const useMoveUpAndDown = () => {
         if (isInitializedIdx) setCurrLocatedIdx(-1);
         return;
       }
-
       setCurrLocatedIdx(-1);
     },
     [setCurrLocatedIdx]

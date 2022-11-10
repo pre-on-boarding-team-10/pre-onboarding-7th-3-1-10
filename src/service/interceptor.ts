@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosAdapter } from 'axios';
 
 const interceptor = axios.create({
   baseURL: 'http://localhost:4000',
