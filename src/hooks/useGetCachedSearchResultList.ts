@@ -18,24 +18,28 @@ const useGetCachedSearchResultList = (debouncedValue: string) => {
 
     const localCachedMap = localCachedMaps[debouncedValue];
 
-    const isCheckExpiredCache = () => {
-      const { expiredTime, data } = localCachedMap;
+    const isExpiredCache = () => {
       const todayOnTime = new Date().getTime();
-
-      if (todayOnTime > expiredTime) {
-        delete localCachedMaps[debouncedValue];
-        setLocalStorageItem('cachedMaps', localCachedMaps);
+      if (todayOnTime > localCachedMap.expiredTime) {
         return true;
       } else {
-        setSearchResultList(data);
         return false;
       }
     };
 
     const isSavedAtCachedMaps = !!localCachedMap;
-    const isExpiredCache = isSavedAtCachedMaps && isCheckExpiredCache();
-    if (!isSavedAtCachedMaps || isExpiredCache)
-      setSearchAPIResults(debouncedValue);
+
+    if (isSavedAtCachedMaps) {
+      if (isExpiredCache()) {
+        delete localCachedMaps[debouncedValue];
+        setLocalStorageItem('cachedMaps', localCachedMaps);
+      } else {
+        setSearchResultList(localCachedMap.data);
+      }
+      return;
+    }
+
+    setSearchAPIResults(debouncedValue);
   }, [debouncedValue]);
 
   return searchResultList;
