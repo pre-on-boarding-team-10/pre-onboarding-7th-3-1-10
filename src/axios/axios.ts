@@ -19,9 +19,9 @@ export const axiosApi = async (keyword: string) => {
 
 axiosInstance.interceptors.request.use(
   config => {
-    console.info("calling api")
-    return config
-    },
+    console.info('calling api');
+    return config;
+  },
   error => {
     return Promise.reject(error);
   }
