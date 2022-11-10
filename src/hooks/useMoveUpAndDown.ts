@@ -5,7 +5,7 @@ import {
   FocusEvent,
   useCallback,
 } from 'react';
-import { ISearchResultListState } from '../types/pages';
+import { IAPIDebounceResState } from '../types/hooks';
 
 const useMoveUpAndDown = () => {
   const [currLocatedIdx, setCurrLocatedIdx] = useState<number>(-1);
@@ -19,7 +19,7 @@ const useMoveUpAndDown = () => {
 
   const moveUpAndDown = (
     e: KeyboardEvent<HTMLInputElement>,
-    searchResultList: ISearchResultListState[]
+    searchResultList: IAPIDebounceResState[]
   ) => {
     const isArrowDownActive = currLocatedIdx < searchResultList.length - 1;
 
@@ -46,13 +46,13 @@ const useMoveUpAndDown = () => {
 
       setCurrLocatedIdx(-1);
     },
-    []
+    [setCurrLocatedIdx]
   );
 
   const onKeyDownHandler = useCallback(
     (
       e: KeyboardEvent<HTMLInputElement>,
-      searchResultList: ISearchResultListState[]
+      searchResultList: IAPIDebounceResState[]
     ) => {
       if (e.nativeEvent.isComposing) return;
       initiallizeCurrLocatedIdx(e);

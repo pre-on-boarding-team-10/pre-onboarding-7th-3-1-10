@@ -4,17 +4,32 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { MininFlexStyle } from '../styles/common';
 import { SearchService } from '../service/SearchService';
 import { ChangeEvent, useState } from 'react';
-import { ISearchResultListState } from '../types/pages';
 import DOMPurify from 'dompurify';
 import { replaceMatchedTextToBold } from '../utils/pages';
 import useMoveUpAndDown from '../hooks/useMoveUpAndDown';
+import useAPIDebounce from '../hooks/useAPIDebounce';
+import useTextDebounce from '../hooks/useTextDebounce';
 
 const Search = (): React.ReactElement => {
-  const [typedSearchWord, setTypedSearchWord] = useState<string>('');
-  const [searchResultList, setSearchResultList] = useState<
-    ISearchResultListState[]
-  >([]);
   const [isInputFocus, setIsInputFocus] = useState<boolean>(false);
+
+  const [typedSearchWord, setTypedSearchWord] = useState<string>('');
+  const debouncedTypeSearchWord = useTextDebounce(typedSearchWord, 500);
+
+  const getSearchResultAPI = (debouncedValue: string) => {
+    const searchService = new SearchService();
+    return searchService.getSearchResult({
+      sickNm_like: debouncedValue,
+    });
+  };
+
+  const isBlankTypedSearchWord = typedSearchWord === '';
+
+  const searchResultList = useAPIDebounce(
+    debouncedTypeSearchWord,
+    getSearchResultAPI,
+    !isInputFocus || isBlankTypedSearchWord
+  );
 
   const {
     onKeyDownHandler,
@@ -22,15 +37,6 @@ const Search = (): React.ReactElement => {
     scrollRef,
     currLocatedIdx,
   } = useMoveUpAndDown();
-
-  const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const searchService = new SearchService();
-    setTypedSearchWord(e.target.value);
-    const searchResultResponse = await searchService.getSearchResult({
-      sickNm_like: e.target.value,
-    });
-    setSearchResultList(searchResultResponse.data);
-  };
 
   const isEmptySearchResultList = searchResultList.length === 0;
 
@@ -49,7 +55,10 @@ const Search = (): React.ReactElement => {
           <SearchInput
             type="text"
             placeholder="질환명을 입력해주세요."
-            onChange={onChange}
+            value={typedSearchWord}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setTypedSearchWord(e.target.value)
+            }
             onKeyDown={e => onKeyDownHandler(e, searchResultList)}
             onFocus={() => setIsInputFocus(true)}
             onBlur={e => {
