@@ -9,14 +9,18 @@ import {
 
 const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
   const [responseList, setResponseList] = useState<IAPIDebounceResState[]>([]);
-  const [cachedMaps, setCachedMaps] = useRecoilState(cachedMapsAtom);
+  // const [cachedMaps, setCachedMaps] = useRecoilState(cachedMapsAtom);
+  const localCachedMaps = localStorage.getItem('cachedMaps')
+    ? JSON.parse(localStorage.getItem('cachedMaps') as string)
+    : {};
 
   useEffect(() => {
     // Functions
     const isCheckExpiredCache = (cachedMapItem: ICachedItem) => {
       const todayOnTime = new Date().getTime();
       if (todayOnTime > cachedMapItem.expiredTime) {
-        delete cachedMaps[debouncedValue];
+        delete localCachedMaps[debouncedValue];
+        localStorage.setItem('cachedMaps', localCachedMaps);
         return true;
       } else {
         setResponseList(cachedMapItem.data);
@@ -28,19 +32,24 @@ const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
       try {
         const apiResponses = await apiCallback(debouncedValue);
         setResponseList(apiResponses.data);
-        setCachedMaps(prev => ({
-          ...prev,
-          [debouncedValue]: {
-            data: apiResponses.data,
-            expiredTime: new Date().getTime() + 1000 * 10,
-          },
-        }));
+        localStorage.setItem(
+          'cachedMaps',
+          JSON.stringify({
+            ...localCachedMaps,
+            [debouncedValue]: {
+              data: apiResponses.data,
+              expiredTime: new Date().getTime() + 1000 * 10,
+            },
+          })
+        );
       } catch (err) {
         throw new Error(`Error: in Cache`);
       }
     };
 
-    const cachedMapItem = cachedMaps[debouncedValue];
+    if (!debouncedValue) return;
+
+    const cachedMapItem = localCachedMaps && localCachedMaps[debouncedValue];
     const isSavedAtCachedMaps = !!cachedMapItem;
     const isExpiredCache =
       isSavedAtCachedMaps && isCheckExpiredCache(cachedMapItem);
@@ -49,7 +58,7 @@ const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
       setResponseListAfterCallAPI();
     }
   }, [debouncedValue]);
-  console.dir(cachedMaps);
+  console.dir(localCachedMaps);
   return responseList;
 };
 
