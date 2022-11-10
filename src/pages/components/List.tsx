@@ -20,6 +20,7 @@ const List = (props: ListProps): React.ReactElement => {
         {splitedArr[0]}
         <strong>{splitedArr[1]}</strong>
         {splitedArr[2]}
+        {splitedArr[3]}
       </span>
     </ListItem>
   );
