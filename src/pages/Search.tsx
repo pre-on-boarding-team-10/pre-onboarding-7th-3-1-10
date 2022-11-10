@@ -3,33 +3,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { MininFlexStyle } from '../styles/common';
 import { SearchService } from '../service/SearchService';
-import { useState } from 'react';
+import {
+  ChangeEvent,
+  useRef,
+  useState,
+  KeyboardEvent,
+  FocusEvent,
+} from 'react';
 import { ISearchResultListState } from '../types/pages';
 import DOMPurify from 'dompurify';
+import { replaceMatchedTextToBold } from '../utils/pages';
+import useMoveUpAndDown from '../hooks/useMoveUpAndDown';
 
 const Search = (): React.ReactElement => {
   const [typedSearchWord, setTypedSearchWord] = useState<string>('');
   const [searchResultList, setSearchResultList] = useState<
     ISearchResultListState[]
   >([]);
+  const [isInputFocus, setIsInputFocus] = useState<boolean>(false);
 
-  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const {
+    onKeyDownHandler,
+    initiallizeCurrLocatedIdx,
+    scrollRef,
+    currLocatedIdx,
+  } = useMoveUpAndDown();
+
+  const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const searchService = new SearchService();
     setTypedSearchWord(e.target.value);
     const searchResultResponse = await searchService.getSearchResult({
-      q: e.target.value,
+      sickNm_like: e.target.value,
     });
     setSearchResultList(searchResultResponse.data);
   };
 
-  const replaceMatchedTextToBold = (searchSentence: string) => {
-    const isMatchedTextRegExp = new RegExp(typedSearchWord, 'g');
-
-    return searchSentence.replace(
-      isMatchedTextRegExp,
-      `<strong>${typedSearchWord}</strong>`
-    );
-  };
+  const isEmptySearchResultList = searchResultList.length === 0;
 
   return (
     <SearchLayout>
@@ -40,34 +49,56 @@ const Search = (): React.ReactElement => {
       <SearchSection>
         <SearchInputBox>
           <FontAwesomeIcon
-            className="search-icon width_height-18"
+            className="search_icon width_height-18"
             icon={faMagnifyingGlass}
           />
           <SearchInput
             type="text"
             placeholder="질환명을 입력해주세요."
             onChange={onChange}
+            onKeyDown={e => onKeyDownHandler(e, searchResultList)}
+            onFocus={() => setIsInputFocus(true)}
+            onBlur={e => {
+              setIsInputFocus(false);
+              initiallizeCurrLocatedIdx(e);
+            }}
           />
           <SearchButton>검색</SearchButton>
         </SearchInputBox>
-        <SearchResultList>
-          <SearchResultH3>추천 검색어</SearchResultH3>
-          {searchResultList.map(searchResultItem => (
-            <SearchResultItem key={searchResultItem.sickCd}>
-              <FontAwesomeIcon
-                className="width_height-18"
-                icon={faMagnifyingGlass}
-              />
-              <SearchResultParagraph
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(
-                    replaceMatchedTextToBold(searchResultItem.sickNm)
-                  ),
-                }}
-              />
-            </SearchResultItem>
-          ))}
-        </SearchResultList>
+        {isInputFocus && (
+          <SearchResultList ref={scrollRef} currLocatedIdx={currLocatedIdx}>
+            <SearchResultH3>추천 검색어</SearchResultH3>
+            {isEmptySearchResultList ? (
+              <EmptySearchResultParagraph>
+                검색어 없음
+              </EmptySearchResultParagraph>
+            ) : (
+              searchResultList.map((searchResultItem, searchResultItemIdx) => (
+                <SearchResultItem
+                  key={searchResultItem.sickCd}
+                  className={
+                    searchResultItemIdx === currLocatedIdx ? 'arrow_active' : ''
+                  }
+                >
+                  <FontAwesomeIcon
+                    className="width_height-18"
+                    icon={faMagnifyingGlass}
+                  />
+                  <SearchResultParagraph
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        replaceMatchedTextToBold(
+                          searchResultItem.sickNm,
+                          typedSearchWord
+                        )
+                      ),
+                    }}
+                  />
+                </SearchResultItem>
+              ))
+            )}
+          </SearchResultList>
+        )}
       </SearchSection>
     </SearchLayout>
   );
@@ -106,7 +137,7 @@ const SearchSection = styled.section`
     height: 1.6rem;
   }
 
-  .search-icon {
+  .search_icon {
     position: absolute;
     top: 50%;
     left: 1.6rem;
@@ -155,7 +186,7 @@ const SearchButton = styled.button`
   }
 `;
 
-const SearchResultList = styled.ul`
+const SearchResultList = styled.ul<{ currLocatedIdx: number }>`
   ${MininFlexStyle({
     flexDirection: 'column',
     gap: '1rem',
@@ -163,10 +194,19 @@ const SearchResultList = styled.ul`
   })}
   position: absolute;
   width: 100%;
+  height: 40rem;
   top: 6.4rem;
   background-color: #ffffff;
   padding: 2.4rem 0;
   border-radius: 20px;
+  overflow: auto;
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  ::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
 `;
 
 const SearchResultItem = styled.li`
@@ -183,8 +223,17 @@ const SearchResultItem = styled.li`
   &:hover {
     background-color: #f5f6fa;
   }
+
+  &.arrow_active {
+    background-color: #f5f6fa;
+  }
 `;
 
 const SearchResultParagraph = styled.p`
   font-size: 1.6rem;
+`;
+
+const EmptySearchResultParagraph = styled.p`
+  font-size: 1.6rem;
+  margin: 10rem auto;
 `;

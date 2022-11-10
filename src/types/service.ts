@@ -1,3 +1,3 @@
 export interface IGetSearchResultParams {
-  q: string;
+  sickNm_like: string;
 }
