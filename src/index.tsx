@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import store from './redux/configStore';
+
 import Router from './router';
 import GlobalStyle from './styles/GlobalStyle';
 
@@ -9,7 +12,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.Fragment>
-    <GlobalStyle />
-    <Router />
+    <Provider store={store}>
+      <GlobalStyle />
+      <Router />
+    </Provider>
   </React.Fragment>
 );
