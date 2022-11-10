@@ -1,42 +1,47 @@
 import axios, { AxiosResponse } from 'axios';
-import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
-import useDebounce from './hooks/useDebounce';
-import useInput from './hooks/useInput';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-type fetchDatas = {
-  sickCd: string;
-  sickNm: string;
-};
+import Nokeyword from './components/Nokeyword';
+import SearchItem from './components/SearchItem';
+import useDebounce from './hooks/useDebounce';
+import useIncludeKeyword from './hooks/useIncludeKeyword';
+import useInput from './hooks/useInput';
 
 const Test = (): JSX.Element => {
   const [keywordList, setKeywordList] = useState<AxiosResponse[] | null>(null);
   const keyword = useInput();
   const { inputValue, onChange } = keyword;
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState<number>(0);
   const debounceValue: string = useDebounce(inputValue, 500);
-  const lastindex = keywordList?.length - 1;
-
-  const includeKeyword = (debounceValue: any) => {
-    const exactWord = '';
-    const sliceDebounceValue = debounceValue.trim().split('');
-    for (let i = 0; i < window.localStorage.length; i++) {
-      if (sliceDebounceValue.includes(localStorage.key(i))) {
-        return exactWord + localStorage.key(i);
+  const localStorageData: string = useIncludeKeyword(debounceValue);
+  useEffect(() => {
+    listSearchMouse();
+  }, []);
+  const listSearchMouse = () => {
+    const lastindex = keywordList?.length - 1;
+    document.addEventListener('keyup', e => {
+      if (e.key === 'ArrowUp') {
+        selected === 1 ? null : setSelected(prev => prev - 1);
+      } else if (e.key === 'ArrowDown') {
+        selected === lastindex ? null : setSelected(prev => prev + 1);
+      } else {
+        return;
       }
-    }
-    return exactWord;
+    });
+    return removeEventListener('keyup', () => {
+      return null;
+    });
   };
+
   useEffect(() => {
     if (debounceValue) {
-      console.log(debounceValue);
       const fetchData = async (debounceValue: string) => {
         if (window.localStorage.getItem(debounceValue)) {
           const result = JSON.parse(window.localStorage.getItem(debounceValue));
           setKeywordList(result);
-        } else if (includeKeyword(debounceValue)) {
+        } else if (localStorageData) {
           const filtered = JSON.parse(
-            window.localStorage.getItem(includeKeyword(debounceValue))
+            window.localStorage.getItem(localStorageData)
           ).filter((v: any) => v.sickNm.includes(debounceValue));
           setKeywordList(filtered);
         } else {
@@ -46,7 +51,8 @@ const Test = (): JSX.Element => {
                 params: { q: debounceValue },
               })
               .then(res => res.data);
-            console.log(request);
+            if (request.length === 0) setKeywordList(request);
+
             window.localStorage.setItem(debounceValue, JSON.stringify(request));
             setKeywordList(request);
           } catch (err) {
@@ -61,35 +67,36 @@ const Test = (): JSX.Element => {
   }, [inputValue, debounceValue]);
 
   const searchItems = keywordList?.map((item: any, idx) => {
-    if (item.sickNm.trim().includes(inputValue)) {
-      return (
-        <Item
-          className={`${
-            idx === selected ? 'list__item--selected' : 'list__item'
-          }`}
-          key={idx}
-        >
-          {item.sickNm}
-        </Item>
-      );
-    }
+    const startKeywordItem = item.sickNm.indexOf(inputValue);
+    const boldText = item.sickNm.split(inputValue);
+    return (
+      <SearchItem
+        rawData={item.sickNm}
+        key={idx}
+        startKeywordItem={startKeywordItem}
+        keywordListLength={keywordList.length}
+        boldText={boldText}
+        inputValue={inputValue}
+        idx={idx}
+        selected={selected}
+        setSelected={setSelected}
+      />
+    );
   });
-
-  const noKeyword = <div>찾으시는 키워드가 없습니다</div>;
-
   if (inputValue === '') {
     return (
       <div>
         <input type="text" value={inputValue} onChange={onChange} />
-        {inputValue}
       </div>
     );
   } else {
     return (
       <div>
         <input type="text" value={inputValue} onChange={onChange} />
-        {inputValue}
-        {keywordList.length < 1 ? noKeyword : undefined}
+        <div>{inputValue}</div>
+        {keywordList.length > 1 ? undefined : (
+          <Nokeyword inputValue={inputValue} />
+        )}
         {searchItems}
       </div>
     );
@@ -97,8 +104,3 @@ const Test = (): JSX.Element => {
 };
 
 export default Test;
-
-const Item = styled.div`
-  background-color: ${props =>
-    props.className === 'list__item--selected' ? ' gray' : 'white'};
-`;
