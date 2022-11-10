@@ -1,11 +1,5 @@
-import {
-  useRef,
-  useState,
-  KeyboardEvent,
-  FocusEvent,
-  useCallback,
-} from 'react';
-import { IAPIDebounceResState } from '../types/hooks';
+import { useRef, useState, KeyboardEvent, useCallback } from 'react';
+import { ISearchResultListState, TEvent } from '../types/hooks';
 
 const useMoveUpAndDown = () => {
   const [currLocatedIdx, setCurrLocatedIdx] = useState<number>(-1);
@@ -19,7 +13,7 @@ const useMoveUpAndDown = () => {
 
   const moveUpAndDown = (
     e: KeyboardEvent<HTMLInputElement>,
-    searchResultList: IAPIDebounceResState[]
+    searchResultList: ISearchResultListState[]
   ) => {
     const isArrowUpActive = e.key === 'ArrowUp' && currLocatedIdx > 0;
     if (isArrowUpActive) {
@@ -36,13 +30,14 @@ const useMoveUpAndDown = () => {
   };
 
   const initiallizeCurrLocatedIdx = useCallback(
-    (e: KeyboardEvent<HTMLInputElement> | FocusEvent<HTMLInputElement>) => {
+    (e: TEvent) => {
       if ('key' in e) {
         const isInitializedIdx = e.key !== 'ArrowDown' && e.key !== 'ArrowUp';
         if (isInitializedIdx) setCurrLocatedIdx(-1);
         return;
+      } else {
+        setCurrLocatedIdx(-1);
       }
-      setCurrLocatedIdx(-1);
     },
     [setCurrLocatedIdx]
   );
@@ -50,7 +45,7 @@ const useMoveUpAndDown = () => {
   const onKeyDownHandler = useCallback(
     (
       e: KeyboardEvent<HTMLInputElement>,
-      searchResultList: IAPIDebounceResState[]
+      searchResultList: ISearchResultListState[]
     ) => {
       if (e.nativeEvent.isComposing) return;
       initiallizeCurrLocatedIdx(e);

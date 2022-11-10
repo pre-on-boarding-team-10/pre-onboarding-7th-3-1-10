@@ -1,9 +1,5 @@
 # 원티드 프리온보딩 프론트엔드 - Week 3-1
 
-## 10팀 맴버 구성
-
-<br/>
-
 ## 10팀 멤버 구성
 
 <br/>
@@ -157,5 +153,3 @@ npm install
 ### 📝 Meeting Log
 
 [회의록 바로가기](https://www.notion.so/Meeting-log-3eff6566fd844052b7a98702ebab8c5b?p=e937bd849c4b48979a50c88ebc87efc4&pm=s)
-message.txt
-7KB

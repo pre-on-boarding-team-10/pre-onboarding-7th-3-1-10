@@ -1,33 +1,18 @@
+import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
+import DOMPurify from 'dompurify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { MininFlexStyle } from '../styles/common';
-import { SearchService } from '../service/SearchService';
-import { ChangeEvent, useState } from 'react';
-import DOMPurify from 'dompurify';
-import { replaceMatchedTextToBold } from '../utils/pages';
 import useMoveUpAndDown from '../hooks/useMoveUpAndDown';
-import useAPIDebounce from '../hooks/useCache';
+import useGetCachedSearchResultList from '../hooks/useGetCachedSearchResultList';
 import useTextDebounce from '../hooks/useTextDebounce';
+import { replaceMatchedTextToBold } from '../utils/pages';
+import { MininFlexStyle } from '../styles/common';
 
 const Search = (): React.ReactElement => {
-  const [isInputFocus, setIsInputFocus] = useState<boolean>(false);
-
   const [typedSearchWord, setTypedSearchWord] = useState<string>('');
-  const debouncedTypeSearchWord = useTextDebounce(typedSearchWord, 500);
-
-  const getSearchResultAPI = (debouncedValue: string) => {
-    const searchService = new SearchService();
-    return searchService.getSearchResult({
-      sickNm_like: debouncedValue,
-    });
-  };
-
-  const searchResultList = useAPIDebounce(
-    debouncedTypeSearchWord,
-    getSearchResultAPI
-  );
-
+  const debouncedSearchWord = useTextDebounce(typedSearchWord, 500);
+  const searchResultList = useGetCachedSearchResultList(debouncedSearchWord);
   const {
     onKeyDownHandler,
     initiallizeCurrLocatedIdx,
@@ -35,6 +20,7 @@ const Search = (): React.ReactElement => {
     currLocatedIdx,
   } = useMoveUpAndDown();
 
+  const [isInputFocus, setIsInputFocus] = useState<boolean>(false);
   const isEmptySearchResultList = searchResultList.length === 0;
 
   return (

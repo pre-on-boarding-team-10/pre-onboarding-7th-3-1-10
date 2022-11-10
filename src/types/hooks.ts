@@ -1,16 +1,10 @@
-import { AxiosResponse } from 'axios';
+import { KeyboardEvent, FocusEvent } from 'react';
 
-export interface IAPIDebounceResState {
-  [key: string]: string;
+export interface ISearchResultListState {
+  sickCd: string;
+  sickNm: string;
 }
 
-export interface ICachedItem {
-  data: IAPIDebounceResState[];
-  expiredTime: number;
-}
-
-export interface ICachedResultsState {
-  [key: string]: ICachedItem;
-}
-
-export type TAPICallback = (debouncedValue: string) => Promise<AxiosResponse>;
+export type TEvent =
+  | KeyboardEvent<HTMLInputElement>
+  | FocusEvent<HTMLInputElement>;
