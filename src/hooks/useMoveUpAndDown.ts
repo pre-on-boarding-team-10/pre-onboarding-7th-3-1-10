@@ -21,16 +21,16 @@ const useMoveUpAndDown = () => {
     e: KeyboardEvent<HTMLInputElement>,
     searchResultList: IAPIDebounceResState[]
   ) => {
-    const isArrowDownActive = currLocatedIdx < searchResultList.length - 1;
-    const isArrowUpActive = currLocatedIdx !== 0;
-
-    if (e.key === 'ArrowDown' && isArrowDownActive) {
-      setCurrLocatedIdx(prev => prev + 1);
+    const isArrowUpActive = e.key === 'ArrowUp' && currLocatedIdx > 0;
+    if (isArrowUpActive) {
+      setCurrLocatedIdx(prev => prev - 1);
       return;
     }
 
-    if (e.key === 'ArrowUp' && isArrowUpActive) {
-      setCurrLocatedIdx(prev => prev - 1);
+    const isArrowDownActive =
+      e.key === 'ArrowDown' && currLocatedIdx < searchResultList.length - 1;
+    if (isArrowDownActive) {
+      setCurrLocatedIdx(prev => prev + 1);
       return;
     }
   };
@@ -57,7 +57,7 @@ const useMoveUpAndDown = () => {
       moveUpAndDown(e, searchResultList);
       scrolledInsideBox();
     },
-    []
+    [currLocatedIdx]
   );
 
   return {

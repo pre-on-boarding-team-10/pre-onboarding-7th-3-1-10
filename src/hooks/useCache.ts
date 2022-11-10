@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { cachedMapsAtom } from '../recoil/cache';
 import {
   IAPIDebounceResState,
   ICachedItem,
@@ -9,10 +7,11 @@ import {
 
 const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
   const [responseList, setResponseList] = useState<IAPIDebounceResState[]>([]);
-  // const [cachedMaps, setCachedMaps] = useRecoilState(cachedMapsAtom);
   const localCachedMaps = localStorage.getItem('cachedMaps')
     ? JSON.parse(localStorage.getItem('cachedMaps') as string)
     : {};
+
+  // 첫 번째
 
   useEffect(() => {
     // Functions
@@ -20,7 +19,7 @@ const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
       const todayOnTime = new Date().getTime();
       if (todayOnTime > cachedMapItem.expiredTime) {
         delete localCachedMaps[debouncedValue];
-        localStorage.setItem('cachedMaps', localCachedMaps);
+        localStorage.setItem('cachedMaps', JSON.stringify(localCachedMaps));
         return true;
       } else {
         setResponseList(cachedMapItem.data);
@@ -38,7 +37,7 @@ const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
             ...localCachedMaps,
             [debouncedValue]: {
               data: apiResponses.data,
-              expiredTime: new Date().getTime() + 1000 * 10,
+              expiredTime: new Date().getTime() + 1000 * 60 * 4,
             },
           })
         );
@@ -47,18 +46,20 @@ const useCache = (debouncedValue: string, apiCallback: TAPICallback) => {
       }
     };
 
-    if (!debouncedValue) return;
+    if (!debouncedValue) {
+      setResponseList([]);
+      return;
+    }
 
     const cachedMapItem = localCachedMaps && localCachedMaps[debouncedValue];
     const isSavedAtCachedMaps = !!cachedMapItem;
     const isExpiredCache =
       isSavedAtCachedMaps && isCheckExpiredCache(cachedMapItem);
-
     if (!isSavedAtCachedMaps || isExpiredCache) {
       setResponseListAfterCallAPI();
     }
   }, [debouncedValue]);
-  console.dir(localCachedMaps);
+
   return responseList;
 };
 
