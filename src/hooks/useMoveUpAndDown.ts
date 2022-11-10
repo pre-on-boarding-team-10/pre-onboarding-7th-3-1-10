@@ -1,5 +1,4 @@
 import {
-  ChangeEvent,
   useRef,
   useState,
   KeyboardEvent,

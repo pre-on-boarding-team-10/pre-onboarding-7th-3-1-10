@@ -3,13 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { MininFlexStyle } from '../styles/common';
 import { SearchService } from '../service/SearchService';
-import {
-  ChangeEvent,
-  useRef,
-  useState,
-  KeyboardEvent,
-  FocusEvent,
-} from 'react';
+import { ChangeEvent, useState } from 'react';
 import { ISearchResultListState } from '../types/pages';
 import DOMPurify from 'dompurify';
 import { replaceMatchedTextToBold } from '../utils/pages';
